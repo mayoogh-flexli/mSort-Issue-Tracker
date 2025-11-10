@@ -1,0 +1,138 @@
+name: 📥 Report Infeed Issue
+description: Report problems with infeed system or material flow
+title: "[Infeed] Short issue description"
+labels: [bug, infeed-issue, status:open]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📥 Infeed Issue Report
+        Report issues with item feeding, detection, or material flow into the sortation system.
+
+  - type: dropdown
+    id: infeed_component
+    attributes:
+      label: 🔧 Infeed Component
+      description: Select the affected component
+      options:
+        - Conveyor Belt/Motor
+        - Item Detection Sensors
+        - Barcode Scanner
+        - Sorting Gate/Diverter
+        - Alignment Mechanism
+        - Speed Control
+        - Emergency Stop System
+        - Wiring/Connectors
+        - Controller/Interface
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: infeed_location
+    attributes:
+      label: 📍 Infeed Line/Location
+      description: Specific infeed line or station ID
+      placeholder: "e.g., Infeed-1, Line A, Station 5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: 📦 Issue Type
+      options:
+        - Item jam/blockage
+        - Missed item detection
+        - Scanner read failure
+        - Incorrect item routing
+        - Belt stoppage
+        - Speed issues (too fast/slow)
+        - Sensor misalignment
+        - Multiple items detected as one
+        - E-stop triggered
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: 📝 Issue Description
+      description: Describe the infeed problem
+      placeholder: "Describe what's happening, symptoms, error conditions"
+    validations:
+      required: true
+
+  - type: input
+    id: issue_start_time
+    attributes:
+      label: ⏰ Issue Start Time
+      description: When did this issue first occur? (YYYY-MM-DD HH:MM)
+      placeholder: "2025-11-10 14:30"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: throughput_impact
+    attributes:
+      label: 📊 Throughput Impact
+      description: How does this affect item processing rate?
+      options:
+        - Complete stoppage (0% throughput)
+        - Severely reduced (>50% reduction)
+        - Moderately reduced (25-50% reduction)
+        - Slightly reduced (<25% reduction)
+        - No throughput impact (quality/accuracy issue)
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_codes
+    attributes:
+      label: ⚠️ Error Codes/Messages
+      description: Any error codes or alarm messages displayed
+      placeholder: "List error codes, alarm messages, or system notifications"
+    validations:
+      required: false
+
+  - type: textarea
+    id: affected_items
+    attributes:
+      label: 📦 Affected Item Details
+      description: Item types, sizes, or characteristics related to the issue
+      placeholder: "e.g., Only large items, items with damaged barcodes, all item types"
+    validations:
+      required: false
+
+  - type: textarea
+    id: media_logs
+    attributes:
+      label: 📜 Logs / Media
+      description: Attach photos of jams, videos, sensor logs, or error logs
+      placeholder: "Drag and drop images/videos or paste log data"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🚨 Priority
+      options:
+        - P0 - Critical (Line Down, no items flowing)
+        - P1 - High (Major throughput impact)
+        - P2 - Medium (Partial impact, workaround exists)
+        - P3 - Low (Monitoring, preventive maintenance)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 📋 Additional Context
+      description: Any other relevant information
+      placeholder: "Recent maintenance, item volume changes, environmental factors, etc."
+    validations:
+      required: false
