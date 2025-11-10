@@ -1,0 +1,80 @@
+name: Issue Close Cleanup
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  cleanup-on-close:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Update labels when issue is closed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const currentLabels = issue.labels.map(l => l.name);
+            
+            // Remove status:open and add status:resolved
+            const statusLabels = currentLabels.filter(l => l.startsWith('status:'));
+            
+            for (const label of statusLabels) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                name: label
+              }).catch(e => console.log(`Label ${label} already removed`));
+            }
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: ['status:resolved']
+            });
+            
+            // Remove bot-down or bot-degraded labels
+            const operationalLabels = ['bot-down', 'bot-degraded'];
+            for (const label of operationalLabels) {
+              if (currentLabels.includes(label)) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: label
+                }).catch(e => console.log(`Label ${label} not found`));
+              }
+            }
+            
+            console.log('Issue closed - labels updated');
+      
+      - name: Add resolution timestamp comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const closedAt = new Date(issue.closed_at);
+            const createdAt = new Date(issue.created_at);
+            const resolutionTime = Math.round((closedAt - createdAt) / (1000 * 60)); // minutes
+            
+            const hours = Math.floor(resolutionTime / 60);
+            const minutes = resolutionTime % 60;
+            
+            let timeString = '';
+            if (hours > 0) {
+              timeString = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            } else {
+              timeString = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            }
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `✅ **Issue Resolved**\n\n📊 Resolution time: ${timeString}\n🕐 Closed at: ${closedAt.toISOString()}`
+            });
