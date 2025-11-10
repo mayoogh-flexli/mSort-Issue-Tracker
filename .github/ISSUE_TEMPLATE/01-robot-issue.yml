@@ -1,0 +1,154 @@
+name: ⚠ Report Robot Issue
+description: Report a malfunction or unexpected behavior in a robot
+title: "[BOT_ID] Component - Short Description"
+labels: [bug, robot-issue, status:open]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🤖 Robot Issue Report
+        Please fill out this form completely. This data feeds into our live health dashboard.
+        
+        **Important:** Use exact Bot ID format (e.g., B10, B3) for proper tracking.
+
+  - type: input
+    id: bot_id
+    attributes:
+      label: 🤖 Bot ID
+      description: Enter the exact Bot ID (format B1, B2, B3, etc.)
+      placeholder: "B10"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 📂 Affected Component
+      description: Select the primary component with the issue
+      options:
+        - Motherboard
+        - Station Reader
+        - WTM Reader
+        - AFC
+        - Drive Motor
+        - Diverter
+        - Electromagnet
+        - LCD Display
+        - Indicator Light
+        - Panel Button
+        - Panel Button LED
+        - Power Supply
+        - Wiring/Connectors
+        - Sensors
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component_status
+    attributes:
+      label: 🔧 Component Status
+      description: Current state of the affected component
+      options:
+        - Non-functional (completely down)
+        - Intermittent (works sometimes)
+        - Degraded (reduced performance)
+        - Error state (shows errors but working)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bot_operational_status
+    attributes:
+      label: 🚦 Bot Operational Status
+      description: Can the bot continue operating?
+      options:
+        - Down (Not operational)
+        - Degraded (Partially functional)
+        - Operational (Issue present but working)
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: 📝 Issue Description
+      description: Clearly describe the problem observed
+      placeholder: "Describe symptoms, error messages, what is/isn't working"
+    validations:
+      required: true
+
+  - type: input
+    id: issue_start_time
+    attributes:
+      label: ⏰ Issue Start Time
+      description: When did this issue first occur? (YYYY-MM-DD HH:MM)
+      placeholder: "2025-11-10 14:30"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: How can this issue be reproduced?
+      placeholder: |
+        1. Power on the robot
+        2. Navigate to station
+        3. Observe diverter fails to actuate
+    validations:
+      required: false
+
+  - type: input
+    id: code_release_id
+    attributes:
+      label: 🏷️ Code Release ID
+      description: Firmware version running on this bot
+      placeholder: "11_Release_1701_17JUN25"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 🏭 Environment
+      options:
+        - Production
+        - Staging
+        - Testing
+        - Development
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_logs
+    attributes:
+      label: 📜 Error Logs / Screenshots
+      description: Paste error logs, CAN bus data, UART output, or attach screenshots
+      placeholder: "Paste logs here or drag and drop images"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🚨 Priority
+      description: Severity of this issue
+      options:
+        - P0 - Critical (Bot Down, blocking operations)
+        - P1 - High (Major impact, workaround available)
+        - P2 - Medium (Minor impact, scheduled fix)
+        - P3 - Low (Cosmetic, no operational impact)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 📋 Additional Context
+      description: Any other relevant information
+      placeholder: "Recent changes, similar issues on other bots, environmental factors, etc."
+    validations:
+      required: false
