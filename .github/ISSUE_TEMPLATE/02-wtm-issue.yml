@@ -1,0 +1,134 @@
+name: 📡 Report WTM Issue
+description: Report Wireless Traffic Management system problems
+title: "[WTM] Short issue description"
+labels: [bug, wtm-issue, status:open]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📡 WTM Issue Report
+        Report connectivity, signal, or wireless communication problems.
+
+  - type: dropdown
+    id: wtm_component
+    attributes:
+      label: 🔧 WTM Component
+      description: Select the affected component
+      options:
+        - Access Point / Router
+        - Network Controller
+        - Signal Coverage
+        - Bot-to-WTM Communication
+        - Handoff/Roaming
+        - Interference
+        - WTM Reader (on bot)
+        - Configuration
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: affected_zone
+    attributes:
+      label: 📍 Affected Zone/Area
+      description: Specific location or zone experiencing issues
+      placeholder: "e.g., Zone A, Aisle 3, Station 12-15, All zones"
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_bots
+    attributes:
+      label: 🤖 Affected Bot IDs
+      description: List bot IDs experiencing connectivity issues (if applicable)
+      placeholder: "e.g., B3, B7, B12 or 'All bots in Zone A' or 'Random bots intermittently'"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: 📶 Issue Type
+      options:
+        - Complete connection loss
+        - Intermittent disconnections
+        - High latency/slow response
+        - Weak signal strength
+        - Failed handoff between APs
+        - Data corruption/packet loss
+        - Configuration error
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_description
+    attributes:
+      label: 📝 Issue Description
+      description: Describe the connectivity or wireless problem
+      placeholder: "Describe symptoms, when it occurs, frequency, impact on bot operations"
+    validations:
+      required: true
+
+  - type: input
+    id: issue_start_time
+    attributes:
+      label: ⏰ Issue Start Time
+      description: When did this issue first occur? (YYYY-MM-DD HH:MM)
+      placeholder: "2025-11-10 14:30"
+    validations:
+      required: false
+
+  - type: input
+    id: signal_strength
+    attributes:
+      label: 📶 Signal Strength (if known)
+      description: RSSI or signal strength measurements
+      placeholder: "e.g., -75 dBm, -80 dBm"
+    validations:
+      required: false
+
+  - type: textarea
+    id: network_diagnostics
+    attributes:
+      label: 🔍 Network Diagnostics
+      description: Paste ping results, connection logs, error messages
+      placeholder: "Network logs, ping test results, traceroute, WTM reader logs"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: 🔄 Frequency
+      description: How often does this issue occur?
+      options:
+        - Constant (always present)
+        - Frequent (multiple times per hour)
+        - Intermittent (few times per day)
+        - Rare (occasional)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🚨 Priority
+      options:
+        - P0 - Critical (System Down, multiple bots affected)
+        - P1 - High (Major impact, operations degraded)
+        - P2 - Medium (Single bot or intermittent issue)
+        - P3 - Low (Minor degradation, monitoring)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 📋 Additional Context
+      description: Any other relevant information
+      placeholder: "Recent infrastructure changes, weather conditions, new equipment nearby, etc."
+    validations:
+      required: false
