@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance History - mSort</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📜 Maintenance History</h1>
+            <div class="header-info">
+                <div class="repo-info">
+                    Repository: <a href="https://github.com/mayoogh-flexli/mSort-Issue-Tracker" target="_blank" class="repo-link" id="repoLink">mayoogh-flexli/mSort-Issue-Tracker</a>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">📊 Dashboard</a>
+                <a href="history.html" class="nav-link active">📜 Maintenance History</a>
+            </div>
+            <div class="last-updated" id="lastUpdated"></div>
+        </header>
+
+        <div class="filter-section">
+            <h3 style="margin-bottom: 15px;">🔍 Filter History</h3>
+            <div class="filter-row">
+                <label for="botFilter">Bot ID:</label>
+                <select id="botFilter" onchange="History.applyFilters()">
+                    <option value="">All Bots</option>
+                </select>
+
+                <label for="componentFilter">Component:</label>
+                <select id="componentFilter" onchange="History.applyFilters()">
+                    <option value="">All Components</option>
+                </select>
+
+                <label for="stateFilter">State:</label>
+                <select id="stateFilter" onchange="History.applyFilters()">
+                    <option value="">All States</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+
+                <button class="btn" onclick="History.load()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div id="botSummary"></div>
+
+        <div id="historyContent">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading maintenance history...
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="history.js"></script>
+</body>
+</html>
