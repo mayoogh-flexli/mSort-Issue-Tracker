@@ -1,4 +1,4 @@
-name: ⚠ Report Robot Issue
+name: Report Robot Issue
 description: Report a malfunction or unexpected behavior in a robot
 title: "[BOT_ID] Component - Short Description"
 labels: [bug, robot-issue, status:open]
@@ -8,24 +8,15 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🤖 Robot Issue Report
+        ## Robot Issue Report
         Please fill out this form completely. This data feeds into our live health dashboard.
         
-        **Important:** Use exact Bot ID format (e.g., B10, B3) for proper tracking.
-
-  - type: input
-    id: bot_id
-    attributes:
-      label: 🤖 Bot ID
-      description: Enter the exact Bot ID (format B1, B2, B3, etc.)
-      placeholder: "B10"
-    validations:
-      required: true
+        **Important:** Bot ID will be extracted from the title. Use format: [B10] Component - Description
 
   - type: dropdown
     id: component
     attributes:
-      label: 📂 Affected Component
+      label: Affected Component
       description: Select the primary component with the issue
       options:
         - Motherboard
@@ -47,9 +38,22 @@ body:
       required: true
 
   - type: dropdown
+    id: issue_category
+    attributes:
+      label: Issue Category
+      description: Primary category of the issue
+      options:
+        - Electronics
+        - Mechanical
+        - Embedded
+        - Software
+    validations:
+      required: true
+
+  - type: dropdown
     id: component_status
     attributes:
-      label: 🔧 Component Status
+      label: Component Status
       description: Current state of the affected component
       options:
         - Non-functional (completely down)
@@ -62,7 +66,7 @@ body:
   - type: dropdown
     id: bot_operational_status
     attributes:
-      label: 🚦 Bot Operational Status
+      label: Bot Operational Status
       description: Can the bot continue operating?
       options:
         - Down (Not operational)
@@ -74,25 +78,37 @@ body:
   - type: textarea
     id: issue_description
     attributes:
-      label: 📝 Issue Description
+      label: Issue Description
       description: Clearly describe the problem observed
       placeholder: "Describe symptoms, error messages, what is/isn't working"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: clarity
+    attributes:
+      label: Clarity of the Issue
+      description: How well-defined and reproducible is this issue?
+      options:
+        - Poor
+        - Good
+        - Excellent
     validations:
       required: true
 
   - type: input
     id: issue_start_time
     attributes:
-      label: ⏰ Issue Start Time
-      description: When did this issue first occur? (YYYY-MM-DD HH:MM)
-      placeholder: "2025-11-10 14:30"
+      label: Issue Start Time
+      description: When did this issue first occur? (YYYY-MM-DD HH:MM format)
+      placeholder: "2025-11-12 14:30"
     validations:
       required: false
 
   - type: textarea
     id: steps_to_reproduce
     attributes:
-      label: 🔄 Steps to Reproduce
+      label: Steps to Reproduce
       description: How can this issue be reproduced?
       placeholder: |
         1. Power on the robot
@@ -104,28 +120,16 @@ body:
   - type: input
     id: code_release_id
     attributes:
-      label: 🏷️ Code Release ID
+      label: Code Release ID
       description: Firmware version running on this bot
       placeholder: "11_Release_1701_17JUN25"
     validations:
       required: false
 
-  - type: dropdown
-    id: environment
-    attributes:
-      label: 🏭 Environment
-      options:
-        - Production
-        - Staging
-        - Testing
-        - Development
-    validations:
-      required: true
-
   - type: textarea
     id: error_logs
     attributes:
-      label: 📜 Error Logs / Screenshots
+      label: Error Logs / Screenshots
       description: Paste error logs, CAN bus data, UART output, or attach screenshots
       placeholder: "Paste logs here or drag and drop images"
     validations:
@@ -134,7 +138,7 @@ body:
   - type: dropdown
     id: priority
     attributes:
-      label: 🚨 Priority
+      label: Priority
       description: Severity of this issue
       options:
         - P0 - Critical (Bot Down, blocking operations)
@@ -147,7 +151,7 @@ body:
   - type: textarea
     id: additional_context
     attributes:
-      label: 📋 Additional Context
+      label: Additional Context
       description: Any other relevant information
       placeholder: "Recent changes, similar issues on other bots, environmental factors, etc."
     validations:
