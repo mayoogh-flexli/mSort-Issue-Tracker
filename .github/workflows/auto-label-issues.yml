@@ -70,5 +70,38 @@ jobs:
                 });
               }
             }
+
+            // --- New: detect the issue template used and add 'robot-issue' label when 01-robot-issue was used ---
+            // Common GitHub behaviour: when an issue template is used, GitHub inserts a hidden HTML comment like:
+            // <!-- template: 01-robot-issue.yml -->
+            // Check for that comment first. Fallback: look for the template filename anywhere in the body.
+            try {
+              const templateCommentMatch = body.match(/<!--\s*template:\s*([^\s>]+)\s*-->/i);
+              const templateFilenameMatch = body.match(/01-robot-issue(?:\.ya?ml)?/i);
+
+              let isRobotTemplate = false;
+
+              if (templateCommentMatch) {
+                const templateUsed = templateCommentMatch[1].trim().toLowerCase();
+                if (templateUsed === '01-robot-issue.yml' || templateUsed === '01-robot-issue') {
+                  isRobotTemplate = true;
+                }
+              } else if (templateFilenameMatch) {
+                // fallback: template filename appears in the body
+                isRobotTemplate = true;
+              }
+
+              if (isRobotTemplate) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['robot-issue']
+                });
+              }
+            } catch (err) {
+              // Safe fail: log and continue with other labeling
+              console.log('Template detection failed:', err);
+            }
             
             console.log('Auto-labeling completed');
