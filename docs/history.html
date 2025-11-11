@@ -9,25 +9,34 @@
 <body>
     <div class="container">
         <header>
-            <h1>📜 Maintenance History</h1>
+            <h1>Maintenance History</h1>
             <div class="header-info">
                 <div class="repo-info">
-                    Repository: <a href="https://github.com/mayoogh-flexli/mSort-Issue-Tracker" target="_blank" class="repo-link" id="repoLink">mayoogh-flexli/mSort-Issue-Tracker</a>
+                    Repository: <a href="#" target="_blank" class="repo-link" id="repoLink"></a>
                 </div>
             </div>
             <div class="nav-links">
-                <a href="index.html" class="nav-link">📊 Dashboard</a>
-                <a href="history.html" class="nav-link active">📜 Maintenance History</a>
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="history.html" class="nav-link active">Maintenance History</a>
             </div>
             <div class="last-updated" id="lastUpdated"></div>
         </header>
 
         <div class="filter-section">
-            <h3 style="margin-bottom: 15px;">🔍 Filter History</h3>
+            <h3>Filter History</h3>
             <div class="filter-row">
                 <label for="botFilter">Bot ID:</label>
                 <select id="botFilter" onchange="History.applyFilters()">
                     <option value="">All Bots</option>
+                </select>
+
+                <label for="categoryFilter">Category:</label>
+                <select id="categoryFilter" onchange="History.applyFilters()">
+                    <option value="">All Categories</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Embedded">Embedded</option>
+                    <option value="Software">Software</option>
                 </select>
 
                 <label for="componentFilter">Component:</label>
@@ -42,7 +51,7 @@
                     <option value="closed">Closed</option>
                 </select>
 
-                <button class="btn" onclick="History.load()">🔄 Refresh</button>
+                <button class="btn" onclick="History.load()">Refresh</button>
             </div>
         </div>
 
