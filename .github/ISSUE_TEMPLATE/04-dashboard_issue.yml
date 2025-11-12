@@ -1,0 +1,83 @@
+name: 🖥️ Dashboard Issue / Feature Request
+description: Report a bug or request a new feature in the Robot Health Dashboard
+title: "[Dashboard] Short description of the issue or request"
+labels: [dashboard]
+assignees: []
+
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: ⚙️ Type
+      description: Select whether this is a bug or a feature request.
+      options:
+        - 🐞 Issue / Bug
+        - ✨ New Feature / Enhancement
+    validations:
+      required: true
+
+  - type: input
+    id: page_name
+    attributes:
+      label: 📄 Page / Module
+      description: Specify where the issue occurs or where the feature applies.
+      placeholder: "e.g., Bot Health Dashboard, History Page, API Integration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: Provide a clear and concise explanation of the issue or feature.
+      placeholder: |
+        - For bugs: What is happening? What should happen?
+        - For features: Describe what functionality you’d like added.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: 🔄 Steps to Reproduce (for issues)
+      description: Describe the steps to reproduce the issue, if applicable.
+      placeholder: |
+        1. Open the dashboard
+        2. Click on 'Refresh'
+        3. Observe console error
+    validations:
+      required: false
+
+  - type: dropdown
+    id: clarity
+    attributes:
+      label: 🧠 Clarity Level
+      description: Rate how clearly the issue or request is described.
+      options:
+        - High (well-documented, clear)
+        - Medium (some details missing)
+        - Low (unclear, needs clarification)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🚨 Priority
+      description: Select the urgency of this issue or request.
+      options:
+        - Critical (Dashboard unusable)
+        - High (Affects key functionality)
+        - Medium (Minor issue or improvement)
+        - Low (Cosmetic or informational)
+    validations:
+      required: true
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: 📸 Screenshots / Logs
+      description: Attach any relevant screenshots or browser console logs.
+      placeholder: "Paste screenshots, error messages, or upload relevant files."
+    validations:
+      required: false
