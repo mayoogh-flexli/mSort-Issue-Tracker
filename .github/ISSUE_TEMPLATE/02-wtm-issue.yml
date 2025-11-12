@@ -1,6 +1,6 @@
-name: 📡 Report WTM Issue
+name: Report WTM Issue
 description: Report Wireless Traffic Management system problems
-title: "[WTM] Short issue description"
+title: "[WTM] "
 labels: [bug, wtm-issue, status:open]
 assignees: []
 
@@ -8,127 +8,161 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 📡 WTM Issue Report
-        Report connectivity, signal, or wireless communication problems.
+        ## WTM Issue Report
+        Please fill out this form completely for WTM system issues.
 
-  - type: dropdown
-    id: wtm_component
+  - type: input
+    id: issue_title
     attributes:
-      label: 🔧 WTM Component
-      description: Select the affected component
-      options:
-        - Access Point / Router
-        - Network Controller
-        - Signal Coverage
-        - Bot-to-WTM Communication
-        - Handoff/Roaming
-        - Interference
-        - WTM Reader (on bot)
-        - Configuration
-        - Other
+      label: Title
+      description: Brief description of the issue
+      placeholder: "e.g., Zone Z1 communication failure"
     validations:
       required: true
 
   - type: input
     id: affected_zone
     attributes:
-      label: 📍 Affected Zone/Area
-      description: Specific location or zone experiencing issues
-      placeholder: "e.g., Zone A, Aisle 3, Station 12-15, All zones"
+      label: Affected Zone
+      description: Which zone is affected? (e.g., Z1, Z2, Z3)
+      placeholder: "Z1"
     validations:
-      required: true
+      required: false
 
-  - type: textarea
-    id: affected_bots
+  - type: input
+    id: affected_column
     attributes:
-      label: 🤖 Affected Bot IDs
-      description: List bot IDs experiencing connectivity issues (if applicable)
-      placeholder: "e.g., B3, B7, B12 or 'All bots in Zone A' or 'Random bots intermittently'"
+      label: Affected Column
+      description: Which column is affected? (e.g., C1, C2, C3)
+      placeholder: "C1"
     validations:
       required: false
 
   - type: dropdown
-    id: issue_type
+    id: component
     attributes:
-      label: 📶 Issue Type
+      label: Affected Component
+      description: Select the affected WTM component
       options:
-        - Complete connection loss
-        - Intermittent disconnections
-        - High latency/slow response
-        - Weak signal strength
-        - Failed handoff between APs
-        - Data corruption/packet loss
-        - Configuration error
+        - Zone
+        - ZTC
+        - Bridge Master
+        - Bridge Slave
+        - Power Supply
+        - Power Cable
+        - CAN Bus
+        - FRC Cable
+        - OTA
+        - Mounting Plate
+        - Mechanical Assembly
         - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_category
+    attributes:
+      label: Issue Category
+      description: Primary category of the issue
+      options:
+        - Mechanical
+        - Electronics
+        - Embedded
+        - Software
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component_status
+    attributes:
+      label: Component Status
+      description: Current state of the affected component
+      options:
+        - Non-functional (completely down)
+        - Intermittent (works sometimes)
+        - Degraded (reduced performance)
+        - Error state (shows errors but working)
     validations:
       required: true
 
   - type: textarea
     id: issue_description
     attributes:
-      label: 📝 Issue Description
-      description: Describe the connectivity or wireless problem
-      placeholder: "Describe symptoms, when it occurs, frequency, impact on bot operations"
+      label: Issue Description
+      description: Clearly describe the problem observed
+      placeholder: "Describe symptoms, error messages, communication failures, etc."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: clarity
+    attributes:
+      label: Clarity of the Issue
+      description: How well-defined and reproducible is this issue?
+      options:
+        - Poor
+        - Good
+        - Excellent
     validations:
       required: true
 
   - type: input
     id: issue_start_time
     attributes:
-      label: ⏰ Issue Start Time
-      description: When did this issue first occur? (YYYY-MM-DD HH:MM)
-      placeholder: "2025-11-10 14:30"
-    validations:
-      required: false
-
-  - type: input
-    id: signal_strength
-    attributes:
-      label: 📶 Signal Strength (if known)
-      description: RSSI or signal strength measurements
-      placeholder: "e.g., -75 dBm, -80 dBm"
+      label: Issue Start Time
+      description: When did this issue first occur? (YYYY-MM-DD HH:MM format)
+      placeholder: "2025-11-12 14:30"
     validations:
       required: false
 
   - type: textarea
-    id: network_diagnostics
+    id: steps_to_reproduce
     attributes:
-      label: 🔍 Network Diagnostics
-      description: Paste ping results, connection logs, error messages
-      placeholder: "Network logs, ping test results, traceroute, WTM reader logs"
+      label: Steps to Reproduce
+      description: How can this issue be reproduced?
+      placeholder: |
+        1. Power on the zone
+        2. Observe communication failure
+        3. Check error logs
+    validations:
+      required: false
+
+  - type: input
+    id: code_release_id
+    attributes:
+      label: Code Release ID
+      description: Firmware/software version running on the system
+      placeholder: "11_Release_1701_17JUN25"
+    validations:
+      required: false
+
+  - type: textarea
+    id: error_logs
+    attributes:
+      label: Error Logs / Screenshots
+      description: Paste error logs, network diagnostics, or attach screenshots
+      placeholder: "Paste logs here or drag and drop images"
     validations:
       required: false
 
   - type: dropdown
-    id: frequency
-    attributes:
-      label: 🔄 Frequency
-      description: How often does this issue occur?
-      options:
-        - Constant (always present)
-        - Frequent (multiple times per hour)
-        - Intermittent (few times per day)
-        - Rare (occasional)
-    validations:
-      required: true
-
-  - type: dropdown
     id: priority
     attributes:
-      label: 🚨 Priority
+      label: Priority
+      description: Severity of this issue
       options:
-        - P0 - Critical (System Down, multiple bots affected)
-        - P1 - High (Major impact, operations degraded)
-        - P2 - Medium (Single bot or intermittent issue)
-        - P3 - Low (Minor degradation, monitoring)
+        - P0 - Critical (System Down, blocking operations)
+        - P1 - High (Major impact, workaround available)
+        - P2 - Medium (Minor impact, scheduled fix)
+        - P3 - Low (Cosmetic, no operational impact)
     validations:
       required: true
 
   - type: textarea
     id: additional_context
     attributes:
-      label: 📋 Additional Context
+      label: Additional Context
       description: Any other relevant information
-      placeholder: "Recent infrastructure changes, weather conditions, new equipment nearby, etc."
+      placeholder: "Recent changes, environmental factors, related issues, etc."
     validations:
       required: false
