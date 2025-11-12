@@ -1,11 +1,1 @@
-blank_issues_enabled: false
-contact_links:
-  - name: 🆘 Emergency Support
-    url: https://your-internal-wiki/emergency-contact
-    about: For critical system-down situations requiring immediate response
-  - name: 📚 Technical Documentation
-    url: https://your-docs-site/robotics-system
-    about: Access troubleshooting guides and system documentation
-  - name: 💬 Team Discussion
-    url: https://your-slack-or-teams/channel
-    about: General questions and discussions with the team
+
