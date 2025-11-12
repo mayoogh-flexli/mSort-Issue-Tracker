@@ -1,6 +1,6 @@
 name: Report WTM Issue
 description: Report Wireless Traffic Management system problems
-title: "[WTM] "
+title: "[WTM] Short issue description"
 labels: [bug, wtm-issue, status:open]
 assignees: []
 
@@ -10,15 +10,6 @@ body:
       value: |
         ## WTM Issue Report
         Please fill out this form completely for WTM system issues.
-
-  - type: input
-    id: issue_title
-    attributes:
-      label: Title
-      description: Brief description of the issue
-      placeholder: "e.g., Zone Z1 communication failure"
-    validations:
-      required: true
 
   - type: input
     id: affected_zone
