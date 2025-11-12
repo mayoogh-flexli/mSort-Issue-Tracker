@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Health Cards - mSort</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bot Health Overview</h1>
+            <div class="header-info">
+                <div class="repo-info">
+                    Monitoring: <a href="#" target="_blank" class="repo-link" id="repoLink"></a>
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="BotHealth.load()">Refresh</button>
+                    <button class="btn secondary" onclick="BotHealth.toggleAutoRefresh()">
+                        <span id="autoRefreshText">Enable Auto-Refresh</span>
+                    </button>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Bot Issues</a>
+                <a href="history.html" class="nav-link">Bot Maintenance History</a>
+                <a href="bot-health.html" class="nav-link active">Bot Health Cards</a>
+                <a href="wtm.html" class="nav-link">WTM Issues</a>
+                <a href="infeed.html" class="nav-link">Infeed Issues</a>
+            </div>
+            <div class="last-updated" id="lastUpdated"></div>
+        </header>
+
+        <!-- Configuration Panel -->
+        <div class="config-panel">
+            <h3>Configure Bots</h3>
+            <div class="config-row">
+                <label>Range:</label>
+                <input type="number" id="botStart" value="1" min="1" max="100">
+                <span>to</span>
+                <input type="number" id="botEnd" value="20" min="1" max="100">
+                <button class="btn" onclick="BotHealth.generateRange()">Generate</button>
+            </div>
+            <div class="config-row">
+                <label>Manual Entry:</label>
+                <input type="text" id="botManual" placeholder="B1, B5, B8, B12" style="flex: 1;">
+                <button class="btn" onclick="BotHealth.generateManual()">Generate</button>
+            </div>
+        </div>
+
+        <!-- Health Cards Grid -->
+        <div id="healthCards">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Configure bots above to view health status
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="bot-health.js"></script>
+</body>
+</html>
