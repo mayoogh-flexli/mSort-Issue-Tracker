@@ -151,14 +151,21 @@ const WTM = {
             html += `
                 <div class="bot-card ${statusClass}">
                     <div class="bot-header">
-                        <div class="bot-id">${issue.zone !== 'N/A' ? issue.zone : 'WTM'}${issue.column !== 'N/A' ? ' - ' + issue.column : ''}</div>
+                        <div class="bot-id">${issue.issueTitle}</div>
                         <div class="status-badge ${statusClass}">
                             ${issue.componentStatus.split('(')[0].trim().toUpperCase()}
                         </div>
                     </div>
                     
                     <div class="issue-info">
-                        <div class="issue-title">${issue.issueTitle}</div>
+                        <div class="issue-row">
+                            <span class="issue-label">Zone:</span>
+                            <span class="issue-value">${issue.zone}</span>
+                        </div>
+                        <div class="issue-row">
+                            <span class="issue-label">Column:</span>
+                            <span class="issue-value">${issue.column}</span>
+                        </div>
                         <div class="issue-row">
                             <span class="issue-label">Component:</span>
                             <span class="issue-value">${issue.component}</span>
