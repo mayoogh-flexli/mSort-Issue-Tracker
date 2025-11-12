@@ -1,4 +1,4 @@
-const History = {
+const WTMHistory = {
     allIssues: [],
     filteredIssues: [],
 
@@ -16,16 +16,15 @@ const History = {
     },
 
     async load() {
-        this.showLoading('Loading maintenance history...');
+        this.showLoading('Loading WTM issue history...');
 
         try {
             const headers = {
                 'Accept': 'application/vnd.github.v3+json'
             };
 
-            // Fetch all robot issues (both open and closed)
             const response = await fetch(
-                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=robot-issue&state=all&per_page=100`,
+                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=wtm-issue&state=all&per_page=100`,
                 { headers }
             );
 
@@ -38,7 +37,7 @@ const History = {
             this.filteredIssues = [...this.allIssues];
             
             this.populateFilters();
-            this.renderBotSummary();
+            this.renderZoneSummary();
             this.render();
             this.updateLastUpdated();
 
@@ -50,9 +49,12 @@ const History = {
     parseIssueData(issue) {
         const body = issue.body || '';
         const title = issue.title || '';
-        
-        const botIdMatch = title.match(/\[([^\]]+)\]/);
-        const botId = botIdMatch ? botIdMatch[1] : 'Unknown';
+
+        const zoneMatch = body.match(/###\s*Affected Zone\s*\n\s*(.+)/i);
+        const zone = zoneMatch ? zoneMatch[1].trim() : 'N/A';
+
+        const columnMatch = body.match(/###\s*Affected Column\s*\n\s*(.+)/i);
+        const column = columnMatch ? columnMatch[1].trim() : 'N/A';
 
         const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
         const component = componentMatch ? componentMatch[1].trim() : 'Unknown';
@@ -75,10 +77,11 @@ const History = {
         const timeMatch = body.match(/###\s*Issue Start Time\s*\n\s*(.+)/i);
         const issueTime = timeMatch ? timeMatch[1].trim() : '';
 
-        const issueTitle = title.replace(/\[[^\]]+\]\s*/, '').trim();
+        const issueTitle = title.replace(/\[WTM\]\s*/i, '').trim();
 
         return {
-            botId,
+            zone,
+            column,
             component,
             category,
             clarity,
@@ -96,17 +99,15 @@ const History = {
     },
 
     populateFilters() {
-        // Get unique bot IDs
-        const botIds = [...new Set(this.allIssues.map(i => i.botId))].sort();
-        const botFilter = document.getElementById('botFilter');
-        botIds.forEach(botId => {
+        const zones = [...new Set(this.allIssues.map(i => i.zone).filter(z => z !== 'N/A'))].sort();
+        const zoneFilter = document.getElementById('zoneFilter');
+        zones.forEach(zone => {
             const option = document.createElement('option');
-            option.value = botId;
-            option.textContent = botId;
-            botFilter.appendChild(option);
+            option.value = zone;
+            option.textContent = zone;
+            zoneFilter.appendChild(option);
         });
 
-        // Get unique components
         const components = [...new Set(this.allIssues.map(i => i.component))].sort();
         const componentFilter = document.getElementById('componentFilter');
         components.forEach(component => {
@@ -118,39 +119,38 @@ const History = {
     },
 
     applyFilters() {
-        const botFilter = document.getElementById('botFilter').value;
+        const zoneFilter = document.getElementById('zoneFilter').value;
         const categoryFilter = document.getElementById('categoryFilter').value;
         const componentFilter = document.getElementById('componentFilter').value;
         const stateFilter = document.getElementById('stateFilter').value;
 
         this.filteredIssues = this.allIssues.filter(issue => {
-            if (botFilter && issue.botId !== botFilter) return false;
+            if (zoneFilter && issue.zone !== zoneFilter) return false;
             if (categoryFilter && issue.category !== categoryFilter) return false;
             if (componentFilter && issue.component !== componentFilter) return false;
             if (stateFilter && issue.state !== stateFilter) return false;
             return true;
         });
 
-        this.renderBotSummary();
+        this.renderZoneSummary();
         this.render();
     },
 
-    renderBotSummary() {
-        const botFilter = document.getElementById('botFilter').value;
+    renderZoneSummary() {
+        const zoneFilter = document.getElementById('zoneFilter').value;
         
-        if (!botFilter) {
-            document.getElementById('botSummary').innerHTML = '';
+        if (!zoneFilter) {
+            document.getElementById('zoneSummary').innerHTML = '';
             return;
         }
 
-        const botIssues = this.filteredIssues.filter(i => i.botId === botFilter);
-        const totalIssues = botIssues.length;
-        const openIssues = botIssues.filter(i => i.state === 'open').length;
-        const closedIssues = botIssues.filter(i => i.state === 'closed').length;
-        const criticalIssues = botIssues.filter(i => i.priority === 'p0').length;
+        const zoneIssues = this.filteredIssues.filter(i => i.zone === zoneFilter);
+        const totalIssues = zoneIssues.length;
+        const openIssues = zoneIssues.filter(i => i.state === 'open').length;
+        const closedIssues = zoneIssues.filter(i => i.state === 'closed').length;
+        const criticalIssues = zoneIssues.filter(i => i.priority === 'p0').length;
 
-        // Calculate average resolution time for closed issues
-        const resolvedIssues = botIssues.filter(i => i.state === 'closed' && i.closedAt);
+        const resolvedIssues = zoneIssues.filter(i => i.state === 'closed' && i.closedAt);
         let avgResolutionTime = 'N/A';
         
         if (resolvedIssues.length > 0) {
@@ -165,9 +165,9 @@ const History = {
             avgResolutionTime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
         }
 
-        document.getElementById('botSummary').innerHTML = `
+        document.getElementById('zoneSummary').innerHTML = `
             <div class="bot-summary">
-                <h3>${botFilter} Summary</h3>
+                <h3>${zoneFilter} Summary</h3>
                 <div class="bot-stats">
                     <div class="bot-stat-item">
                         <div class="label">Total Issues</div>
@@ -205,7 +205,6 @@ const History = {
             return;
         }
 
-        // Sort by most recent first
         const sortedIssues = [...this.filteredIssues].sort((a, b) => {
             return new Date(b.updatedAt) - new Date(a.updatedAt);
         });
@@ -214,6 +213,7 @@ const History = {
 
         sortedIssues.forEach(issue => {
             const resolutionTime = this.calculateResolutionTime(issue);
+            const location = issue.zone !== 'N/A' ? `${issue.zone}${issue.column !== 'N/A' ? ' - ' + issue.column : ''}` : 'WTM';
             
             html += `
                 <div class="history-card ${issue.state}">
@@ -222,7 +222,7 @@ const History = {
                             <h3>${issue.issueTitle}</h3>
                         </div>
                         <div class="history-meta">
-                            <span class="bot-badge">${issue.botId}</span>
+                            <span class="bot-badge">${location}</span>
                             <span class="state-badge ${issue.state}">
                                 ${issue.state === 'open' ? 'OPEN' : 'RESOLVED'}
                             </span>
@@ -329,7 +329,7 @@ const History = {
             <div class="error">
                 <strong>Error:</strong> ${message}
                 <br><br>
-                <button class="btn" onclick="History.load()">Try Again</button>
+                <button class="btn" onclick="WTMHistory.load()">Try Again</button>
             </div>
         `;
     },
@@ -343,7 +343,6 @@ const History = {
     }
 };
 
-// Initialize history page when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-    History.init();
+    WTMHistory.init();
 });

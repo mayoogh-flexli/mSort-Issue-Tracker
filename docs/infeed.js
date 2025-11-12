@@ -1,4 +1,4 @@
-const Dashboard = {
+const Infeed = {
     autoRefreshInterval: null,
     autoRefreshEnabled: false,
 
@@ -16,7 +16,7 @@ const Dashboard = {
     },
 
     async load() {
-        this.showLoading('Loading robot status...');
+        this.showLoading('Loading infeed issues...');
 
         try {
             const headers = {
@@ -24,7 +24,7 @@ const Dashboard = {
             };
 
             const response = await fetch(
-                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=robot-issue&state=open`,
+                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=infeed-issue&state=open`,
                 { headers }
             );
 
@@ -44,9 +44,6 @@ const Dashboard = {
     parseIssueData(issue) {
         const body = issue.body || '';
         const title = issue.title || '';
-        
-        const botIdMatch = title.match(/\[([^\]]+)\]/);
-        const botId = botIdMatch ? botIdMatch[1] : 'Unknown';
 
         const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
         const component = componentMatch ? componentMatch[1].trim() : 'Unknown';
@@ -56,22 +53,6 @@ const Dashboard = {
 
         const clarityMatch = body.match(/###\s*Clarity of the Issue\s*\n\s*(.+)/i);
         const clarity = clarityMatch ? clarityMatch[1].trim() : 'Unknown';
-
-        let status = 'operational';
-        const labelNames = issue.labels.map(l => l.name.toLowerCase());
-        
-        if (labelNames.includes('bot-down')) {
-            status = 'down';
-        } else if (labelNames.includes('bot-degraded')) {
-            status = 'degraded';
-        } else {
-            const statusMatch = body.match(/###\s*Bot Operational Status\s*\n\s*(.+)/i);
-            if (statusMatch) {
-                const statusText = statusMatch[1].toLowerCase();
-                if (statusText.includes('down')) status = 'down';
-                else if (statusText.includes('degraded')) status = 'degraded';
-            }
-        }
 
         const compStatusMatch = body.match(/###\s*Component Status\s*\n\s*(.+)/i);
         const componentStatus = compStatusMatch ? compStatusMatch[1].trim() : 'Unknown';
@@ -90,14 +71,12 @@ const Dashboard = {
         const timeMatch = body.match(/###\s*Issue Start Time\s*\n\s*(.+)/i);
         const issueTime = timeMatch ? timeMatch[1].trim() : '';
 
-        const issueTitle = title.replace(/\[[^\]]+\]\s*/, '').trim();
+        const issueTitle = title.replace(/\[Infeed\]\s*/i, '').trim();
 
         return {
-            botId,
             component,
             category,
             clarity,
-            status,
             componentStatus,
             priority,
             issueTime,
@@ -112,8 +91,8 @@ const Dashboard = {
         if (issues.length === 0) {
             document.getElementById('content').innerHTML = `
                 <div class="no-issues">
-                    <h2>All Systems Operational</h2>
-                    <p>No open robot issues found. All bots are running smoothly!</p>
+                    <h2>All Infeed Systems Operational</h2>
+                    <p>No open infeed issues found</p>
                 </div>
             `;
             return;
@@ -123,26 +102,11 @@ const Dashboard = {
 
         const stats = {
             total: parsedIssues.length,
-            operational: parsedIssues.filter(i => i.status === 'operational').length,
-            degraded: parsedIssues.filter(i => i.status === 'degraded').length,
-            down: parsedIssues.filter(i => i.status === 'down').length,
-            critical: parsedIssues.filter(i => i.priority === 'p0').length
+            critical: parsedIssues.filter(i => i.priority === 'p0').length,
+            high: parsedIssues.filter(i => i.priority === 'p1').length,
+            medium: parsedIssues.filter(i => i.priority === 'p2').length,
+            low: parsedIssues.filter(i => i.priority === 'p3').length
         };
-
-        const botGroups = {};
-        parsedIssues.forEach(issue => {
-            if (!botGroups[issue.botId]) {
-                botGroups[issue.botId] = [];
-            }
-            botGroups[issue.botId].push(issue);
-        });
-
-        const sortedBots = Object.keys(botGroups).sort((a, b) => {
-            const statusPriority = { down: 0, degraded: 1, operational: 2 };
-            const statusA = Math.min(...botGroups[a].map(i => statusPriority[i.status]));
-            const statusB = Math.min(...botGroups[b].map(i => statusPriority[i.status]));
-            return statusA - statusB;
-        });
 
         let html = `
             <div class="stats">
@@ -150,48 +114,41 @@ const Dashboard = {
                     <h3>Total Issues</h3>
                     <div class="number">${stats.total}</div>
                 </div>
-                <div class="stat-card operational">
-                    <h3>Operational</h3>
-                    <div class="number">${stats.operational}</div>
-                </div>
-                <div class="stat-card degraded">
-                    <h3>Degraded</h3>
-                    <div class="number">${stats.degraded}</div>
-                </div>
-                <div class="stat-card down">
-                    <h3>Down</h3>
-                    <div class="number">${stats.down}</div>
-                </div>
                 <div class="stat-card down">
                     <h3>Critical</h3>
                     <div class="number">${stats.critical}</div>
+                </div>
+                <div class="stat-card degraded">
+                    <h3>High</h3>
+                    <div class="number">${stats.high}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Medium</h3>
+                    <div class="number">${stats.medium}</div>
+                </div>
+                <div class="stat-card operational">
+                    <h3>Low</h3>
+                    <div class="number">${stats.low}</div>
                 </div>
             </div>
 
             <div class="bot-grid">
         `;
 
-        sortedBots.forEach(botId => {
-            const botIssues = botGroups[botId];
-            const worstStatus = botIssues.some(i => i.status === 'down') ? 'down' :
-                               botIssues.some(i => i.status === 'degraded') ? 'degraded' : 'operational';
+        parsedIssues.forEach(issue => {
+            const statusClass = issue.priority === 'p0' ? 'down' : issue.priority === 'p1' ? 'degraded' : 'operational';
+            const timeDisplay = issue.issueTime || this.formatDate(issue.createdAt);
+            const timeSince = this.getTimeSince(issue.createdAt);
             
             html += `
-                <div class="bot-card ${worstStatus}">
+                <div class="bot-card ${statusClass}">
                     <div class="bot-header">
-                        <div class="bot-id">${botId}</div>
-                        <div class="status-badge ${worstStatus}">
-                            ${worstStatus === 'down' ? 'DOWN' : 
-                              worstStatus === 'degraded' ? 'DEGRADED' : 'OPERATIONAL'}
+                        <div class="bot-id">Infeed</div>
+                        <div class="status-badge ${statusClass}">
+                            ${issue.componentStatus.split('(')[0].trim().toUpperCase()}
                         </div>
                     </div>
-            `;
-
-            botIssues.forEach(issue => {
-                const timeDisplay = issue.issueTime || this.formatDate(issue.createdAt);
-                const timeSince = this.getTimeSince(issue.createdAt);
-                
-                html += `
+                    
                     <div class="issue-info">
                         <div class="issue-title">${issue.issueTitle}</div>
                         <div class="issue-row">
@@ -226,10 +183,8 @@ const Dashboard = {
                             View Issue #${issue.issueNumber}
                         </a>
                     </div>
-                `;
-            });
-
-            html += `</div>`;
+                </div>
+            `;
         });
 
         html += `</div>`;
@@ -279,7 +234,7 @@ const Dashboard = {
             <div class="error">
                 <strong>Error:</strong> ${message}
                 <br><br>
-                <button class="btn" onclick="Dashboard.load()">Try Again</button>
+                <button class="btn" onclick="Infeed.load()">Try Again</button>
             </div>
         `;
     },
@@ -311,7 +266,6 @@ const Dashboard = {
     }
 };
 
-// Initialize dashboard when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-    Dashboard.init();
+    Infeed.init();
 });

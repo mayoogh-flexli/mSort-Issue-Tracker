@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WTM Issue History - mSort</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WTM Issue History</h1>
+            <div class="header-info">
+                <div class="repo-info">
+                    Repository: <a href="#" target="_blank" class="repo-link" id="repoLink"></a>
+                </div>
+                <div class="controls">
+                    <a href="wtm.html" class="btn secondary">Back to WTM Issues</a>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="history.html" class="nav-link">Maintenance History</a>
+                <a href="wtm.html" class="nav-link active">WTM Issues</a>
+                <a href="infeed.html" class="nav-link">Infeed Issues</a>
+            </div>
+            <div class="last-updated" id="lastUpdated"></div>
+        </header>
+
+        <div class="filter-section">
+            <h3>Filter History</h3>
+            <div class="filter-row">
+                <label for="zoneFilter">Zone:</label>
+                <select id="zoneFilter" onchange="WTMHistory.applyFilters()">
+                    <option value="">All Zones</option>
+                </select>
+
+                <label for="categoryFilter">Category:</label>
+                <select id="categoryFilter" onchange="WTMHistory.applyFilters()">
+                    <option value="">All Categories</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Embedded">Embedded</option>
+                    <option value="Software">Software</option>
+                </select>
+
+                <label for="componentFilter">Component:</label>
+                <select id="componentFilter" onchange="WTMHistory.applyFilters()">
+                    <option value="">All Components</option>
+                </select>
+
+                <label for="stateFilter">State:</label>
+                <select id="stateFilter" onchange="WTMHistory.applyFilters()">
+                    <option value="">All States</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+
+                <button class="btn" onclick="WTMHistory.load()">Refresh</button>
+            </div>
+        </div>
+
+        <div id="zoneSummary"></div>
+
+        <div id="historyContent">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading WTM issue history...
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="wtm-history.js"></script>
+</body>
+</html>

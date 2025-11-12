@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Health Dashboard - mSort</title>
+    <title>WTM Issues - mSort</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Robot Health Dashboard</h1>
+            <h1>WTM Issues Dashboard</h1>
             <div class="header-info">
                 <div class="repo-info">
                     Monitoring: <a href="#" target="_blank" class="repo-link" id="repoLink"></a>
                 </div>
                 <div class="controls">
-                    <button class="btn" onclick="Dashboard.load()">
-                        <span id="refreshBtn">Refresh</span>
+                    <button class="btn" onclick="WTM.load()">
+                        <span>Refresh</span>
                     </button>
-                    <button class="btn secondary" onclick="Dashboard.toggleAutoRefresh()">
+                    <button class="btn secondary" onclick="WTM.toggleAutoRefresh()">
                         <span id="autoRefreshText">Enable Auto-Refresh</span>
                     </button>
+                    <a href="wtm-history.html" class="btn secondary">View History</a>
                 </div>
             </div>
             <div class="nav-links">
-                <a href="index.html" class="nav-link active">Dashboard</a>
+                <a href="index.html" class="nav-link">Dashboard</a>
                 <a href="history.html" class="nav-link">Maintenance History</a>
-                <a href="wtm.html" class="nav-link">WTM Issues</a>
+                <a href="wtm.html" class="nav-link active">WTM Issues</a>
                 <a href="infeed.html" class="nav-link">Infeed Issues</a>
             </div>
             <div class="last-updated" id="lastUpdated"></div>
@@ -35,12 +36,12 @@
         <div id="content">
             <div class="loading">
                 <div class="loading-spinner"></div>
-                Loading dashboard data...
+                Loading WTM issues...
             </div>
         </div>
     </div>
 
     <script src="config.js"></script>
-    <script src="dashboard.js"></script>
+    <script src="wtm.js"></script>
 </body>
 </html>

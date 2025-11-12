@@ -76,5 +76,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
-              body: `✅ **Issue Resolved**\n\n📊 Resolution time: ${timeString}\n🕐 Closed at: ${closedAt.toISOString()}`
+              body: `**Issue Resolved**\n\nResolution time: ${timeString}\nClosed at: ${closedAt.toISOString()}`
             });

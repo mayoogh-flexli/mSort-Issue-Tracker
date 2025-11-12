@@ -1,4 +1,4 @@
-const History = {
+const InfeedHistory = {
     allIssues: [],
     filteredIssues: [],
 
@@ -16,16 +16,15 @@ const History = {
     },
 
     async load() {
-        this.showLoading('Loading maintenance history...');
+        this.showLoading('Loading infeed issue history...');
 
         try {
             const headers = {
                 'Accept': 'application/vnd.github.v3+json'
             };
 
-            // Fetch all robot issues (both open and closed)
             const response = await fetch(
-                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=robot-issue&state=all&per_page=100`,
+                `${window.MSORT_CONFIG.GITHUB_API_BASE}/repos/${window.MSORT_CONFIG.REPO_OWNER}/${window.MSORT_CONFIG.REPO_NAME}/issues?labels=infeed-issue&state=all&per_page=100`,
                 { headers }
             );
 
@@ -38,7 +37,7 @@ const History = {
             this.filteredIssues = [...this.allIssues];
             
             this.populateFilters();
-            this.renderBotSummary();
+            this.renderInfeedSummary();
             this.render();
             this.updateLastUpdated();
 
@@ -50,9 +49,6 @@ const History = {
     parseIssueData(issue) {
         const body = issue.body || '';
         const title = issue.title || '';
-        
-        const botIdMatch = title.match(/\[([^\]]+)\]/);
-        const botId = botIdMatch ? botIdMatch[1] : 'Unknown';
 
         const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
         const component = componentMatch ? componentMatch[1].trim() : 'Unknown';
@@ -75,10 +71,9 @@ const History = {
         const timeMatch = body.match(/###\s*Issue Start Time\s*\n\s*(.+)/i);
         const issueTime = timeMatch ? timeMatch[1].trim() : '';
 
-        const issueTitle = title.replace(/\[[^\]]+\]\s*/, '').trim();
+        const issueTitle = title.replace(/\[Infeed\]\s*/i, '').trim();
 
         return {
-            botId,
             component,
             category,
             clarity,
@@ -96,17 +91,6 @@ const History = {
     },
 
     populateFilters() {
-        // Get unique bot IDs
-        const botIds = [...new Set(this.allIssues.map(i => i.botId))].sort();
-        const botFilter = document.getElementById('botFilter');
-        botIds.forEach(botId => {
-            const option = document.createElement('option');
-            option.value = botId;
-            option.textContent = botId;
-            botFilter.appendChild(option);
-        });
-
-        // Get unique components
         const components = [...new Set(this.allIssues.map(i => i.component))].sort();
         const componentFilter = document.getElementById('componentFilter');
         components.forEach(component => {
@@ -118,39 +102,28 @@ const History = {
     },
 
     applyFilters() {
-        const botFilter = document.getElementById('botFilter').value;
         const categoryFilter = document.getElementById('categoryFilter').value;
         const componentFilter = document.getElementById('componentFilter').value;
         const stateFilter = document.getElementById('stateFilter').value;
 
         this.filteredIssues = this.allIssues.filter(issue => {
-            if (botFilter && issue.botId !== botFilter) return false;
             if (categoryFilter && issue.category !== categoryFilter) return false;
             if (componentFilter && issue.component !== componentFilter) return false;
             if (stateFilter && issue.state !== stateFilter) return false;
             return true;
         });
 
-        this.renderBotSummary();
+        this.renderInfeedSummary();
         this.render();
     },
 
-    renderBotSummary() {
-        const botFilter = document.getElementById('botFilter').value;
-        
-        if (!botFilter) {
-            document.getElementById('botSummary').innerHTML = '';
-            return;
-        }
+    renderInfeedSummary() {
+        const totalIssues = this.filteredIssues.length;
+        const openIssues = this.filteredIssues.filter(i => i.state === 'open').length;
+        const closedIssues = this.filteredIssues.filter(i => i.state === 'closed').length;
+        const criticalIssues = this.filteredIssues.filter(i => i.priority === 'p0').length;
 
-        const botIssues = this.filteredIssues.filter(i => i.botId === botFilter);
-        const totalIssues = botIssues.length;
-        const openIssues = botIssues.filter(i => i.state === 'open').length;
-        const closedIssues = botIssues.filter(i => i.state === 'closed').length;
-        const criticalIssues = botIssues.filter(i => i.priority === 'p0').length;
-
-        // Calculate average resolution time for closed issues
-        const resolvedIssues = botIssues.filter(i => i.state === 'closed' && i.closedAt);
+        const resolvedIssues = this.filteredIssues.filter(i => i.state === 'closed' && i.closedAt);
         let avgResolutionTime = 'N/A';
         
         if (resolvedIssues.length > 0) {
@@ -165,9 +138,9 @@ const History = {
             avgResolutionTime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
         }
 
-        document.getElementById('botSummary').innerHTML = `
+        document.getElementById('infeedSummary').innerHTML = `
             <div class="bot-summary">
-                <h3>${botFilter} Summary</h3>
+                <h3>Infeed System Summary</h3>
                 <div class="bot-stats">
                     <div class="bot-stat-item">
                         <div class="label">Total Issues</div>
@@ -205,7 +178,6 @@ const History = {
             return;
         }
 
-        // Sort by most recent first
         const sortedIssues = [...this.filteredIssues].sort((a, b) => {
             return new Date(b.updatedAt) - new Date(a.updatedAt);
         });
@@ -222,7 +194,7 @@ const History = {
                             <h3>${issue.issueTitle}</h3>
                         </div>
                         <div class="history-meta">
-                            <span class="bot-badge">${issue.botId}</span>
+                            <span class="bot-badge">Infeed</span>
                             <span class="state-badge ${issue.state}">
                                 ${issue.state === 'open' ? 'OPEN' : 'RESOLVED'}
                             </span>
@@ -329,7 +301,7 @@ const History = {
             <div class="error">
                 <strong>Error:</strong> ${message}
                 <br><br>
-                <button class="btn" onclick="History.load()">Try Again</button>
+                <button class="btn" onclick="InfeedHistory.load()">Try Again</button>
             </div>
         `;
     },
@@ -343,7 +315,6 @@ const History = {
     }
 };
 
-// Initialize history page when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-    History.init();
+    InfeedHistory.init();
 });
