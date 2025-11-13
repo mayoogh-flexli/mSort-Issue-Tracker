@@ -31,28 +31,29 @@
             <div class="last-updated" id="lastUpdated"></div>
         </header>
 
-        <!-- Configuration Panel -->
         <div class="config-panel">
-            <h3>Configure Bots</h3>
+            <h3>Configure Bots to Monitor</h3>
             <div class="config-row">
-                <label>Range:</label>
-                <input type="number" id="botStart" value="1" min="1" max="100">
-                <span>to</span>
-                <input type="number" id="botEnd" value="20" min="1" max="100">
-                <button class="btn" onclick="BotHealth.generateRange()">Generate</button>
+                <label>Bot Range:</label>
+                <input type="number" id="botStart" value="1" min="1" max="100" placeholder="Start">
+                <span style="color: white;">to</span>
+                <input type="number" id="botEnd" value="20" min="1" max="100" placeholder="End">
+                <button class="btn" onclick="BotHealth.generateRange()">Generate Range</button>
             </div>
             <div class="config-row">
-                <label>Manual Entry:</label>
-                <input type="text" id="botManual" placeholder="B1, B5, B8, B12" style="flex: 1;">
-                <button class="btn" onclick="BotHealth.generateManual()">Generate</button>
+                <label>Or Manual:</label>
+                <input type="text" id="botManual" placeholder="e.g., B1, B5, B10, B15" style="flex: 1;">
+                <button class="btn" onclick="BotHealth.generateManual()">Generate Manual</button>
             </div>
         </div>
 
-        <!-- Health Cards Grid -->
+        <div id="summaryStats"></div>
+
         <div id="healthCards">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                Configure bots above to view health status
+            <div class="empty-state">
+                <div class="empty-state-icon">🤖</div>
+                <h3>Configure Bots Above</h3>
+                <p>Select a bot range or manually enter bot IDs to view their health status</p>
             </div>
         </div>
     </div>
