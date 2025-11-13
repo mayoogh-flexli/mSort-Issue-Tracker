@@ -598,3 +598,438 @@ h1 {
         font-size: 24px;
     }
 }
+
+/* Bot Health Cards - Enhanced UI */
+.config-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.config-panel h3 {
+    margin-bottom: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.config-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.config-row label {
+    color: white;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.config-row input {
+    padding: 10px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.config-row input:focus {
+    outline: none;
+    border-color: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.config-row .btn {
+    background: white;
+    color: #667eea;
+    font-weight: 700;
+    padding: 10px 25px;
+}
+
+.config-row .btn:hover {
+    background: #f8f9fa;
+    color: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.health-summary-stats {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.health-summary-stats h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.health-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.health-stat-item {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.health-stat-item.healthy { border-left-color: #27ae60; }
+.health-stat-item.degraded { border-left-color: #f39c12; }
+.health-stat-item.critical { border-left-color: #e74c3c; }
+.health-stat-item.total { border-left-color: #3498db; }
+
+.health-stat-label {
+    font-size: 11px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.health-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.bot-health-card {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.bot-health-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.bot-health-card.healthy {
+    border-top: 4px solid #27ae60;
+}
+
+.bot-health-card.degraded {
+    border-top: 4px solid #f39c12;
+    border-color: rgba(243, 156, 18, 0.2);
+}
+
+.bot-health-card.critical {
+    border-top: 4px solid #e74c3c;
+    border-color: rgba(231, 76, 60, 0.2);
+}
+
+.bot-health-header {
+    padding: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.bot-health-id {
+    font-size: 28px;
+    font-weight: 800;
+    color: #2c3e50;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.bot-health-status {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bot-health-status.healthy {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.bot-health-status.degraded {
+    background: #fef5e7;
+    color: #f39c12;
+}
+
+.bot-health-status.critical {
+    background: #fadbd8;
+    color: #e74c3c;
+}
+
+.bot-health-summary {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.component-list {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.component-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: default;
+    transition: all 0.2s;
+    background: #f8f9fa;
+    border: 1px solid transparent;
+}
+
+.component-item:hover {
+    background: white;
+    border-color: #ecf0f1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.component-item.has-issue {
+    cursor: pointer;
+    background: white;
+}
+
+.component-item.has-issue:hover {
+    transform: translateX(5px);
+    border-color: #3498db;
+}
+
+.component-name {
+    color: #2c3e50;
+    font-weight: 600;
+    flex: 1;
+}
+
+.component-health {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.component-health .status-icon {
+    font-size: 14px;
+}
+
+.component-health.healthy {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.component-health.degraded {
+    background: #fef5e7;
+    color: #f39c12;
+}
+
+.component-health.critical {
+    background: #fadbd8;
+    color: #e74c3c;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Enhanced Hover Popup */
+.issue-popup {
+    position: fixed;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 350px;
+    display: none;
+    animation: popupFadeIn 0.2s ease-out;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.issue-popup.show {
+    display: block;
+}
+
+.issue-popup::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+.issue-popup h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.issue-popup-row {
+    font-size: 13px;
+    margin: 10px 0;
+    color: #7f8c8d;
+    display: flex;
+    gap: 10px;
+}
+
+.issue-popup-row strong {
+    color: #2c3e50;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.issue-popup-description {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ecf0f1;
+    font-size: 13px;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.issue-popup-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.issue-popup-link:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.empty-state p {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* Loading State Enhancement */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ecf0f1;
+    border-top-color: #3498db;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments for health cards */
+@media (max-width: 768px) {
+    .health-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .config-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .config-row label {
+        min-width: auto;
+    }
+    
+    .health-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .issue-popup {
+        max-width: 90vw;
+        left: 5vw !important;
+    }
+}
