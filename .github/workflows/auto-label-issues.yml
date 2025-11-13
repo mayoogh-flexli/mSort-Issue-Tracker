@@ -1,95 +1,82 @@
 name: Auto-label Issues
-
 on:
   issues:
     types: [opened, edited]
-
 jobs:
   auto-label:
     runs-on: ubuntu-latest
     permissions:
       issues: write
       contents: read
-
     steps:
-      - name: Auto-label using GitHub Script
+      - name: Add component and feature labels
         uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
             const body = issue.body || '';
             const title = issue.title || '';
-
-            // -------------------------------
-            // COMPONENT → LABEL MAPPING
-            // -------------------------------
-            const componentLabelMap = {
-              'drive motor, motherboard': 'F1_bot_movement',
-              'station reader': 'F2_station_reader',
-              'diverter': 'F3_switching',
-              'wtm-issue': 'F4_collision',
-              'infeed-issue': 'F5_infeed',
-              'afc, electromagnet': 'F6_drop_off',
-              'motherboard closure': 'F7_motherboard_closure'
-            };
-
-            // Extract "Affected Component"
-            const compMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
-            if (compMatch) {
-              const compRaw = compMatch[1].trim().toLowerCase();
-
-              for (const key in componentLabelMap) {
-                if (compRaw.includes(key)) {
-                  await github.rest.issues.addLabels({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    labels: [componentLabelMap[key]]
-                  });
-                }
-              }
-            }
-
-            // -------------------------------
-            // TITLE BASED LABELING
-            // -------------------------------
-            const titleLabelMap = [
-              { keyword: '[wtm]', label: 'F4_collision' },
-              { keyword: '[infeed]', label: 'F5_infeed' }
-              // Add more here if needed
-            ];
-
-            for (const rule of titleLabelMap) {
-              if (title.toLowerCase().includes(rule.keyword.toLowerCase())) {
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  labels: [rule.label]
-                });
-              }
-            }
-
-            // -------------------------------
-            // YOUR EXISTING REGEX LABEL LOGIC
-            // -------------------------------
             
-            // Parse component
+            // Feature mapping based on component
+            const componentToFeatureMap = {
+              'drive-motor': 'F1_bot_movement',
+              'motherboard': 'F1_bot_movement',
+              'station-reader': 'F2_station_reader',
+              'diverter': 'F3_switching',
+              'afc': 'F6_drop_off',
+              'electromagnet': 'F6_drop_off',
+              // Add more mappings as needed
+            };
+            
+            // Feature mapping based on title
+            const titleToFeatureMap = {
+              'WTM': 'F4_collision',
+              'Infeed': 'F5_infeed',
+            };
+            
+            // Parse component from issue body
             const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
+            
             if (componentMatch) {
               const component = componentMatch[1].trim().toLowerCase()
                 .replace(/\s+/g, '-')
                 .replace(/\//g, '-')
                 .replace(/[()]/g, '');
               
+              // Add component label
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
                 labels: [`component:${component}`]
               });
+              
+              // Add feature label based on component
+              if (componentToFeatureMap[component]) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [componentToFeatureMap[component]]
+                });
+                console.log(`Added feature label: ${componentToFeatureMap[component]}`);
+              }
             }
-
+            
+            // Add feature label based on title
+            for (const [keyword, featureLabel] of Object.entries(titleToFeatureMap)) {
+              if (title.includes(`[${keyword}]`)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [featureLabel]
+                });
+                console.log(`Added feature label from title: ${featureLabel}`);
+                break; // Only add one feature label from title
+              }
+            }
+            
             // Parse issue category
             const categoryMatch = body.match(/###\s*Issue Category\s*\n\s*(.+)/i);
             if (categoryMatch) {
@@ -101,7 +88,7 @@ jobs:
                 labels: [`category:${category}`]
               });
             }
-
+            
             // Parse clarity
             const clarityMatch = body.match(/###\s*Clarity of the Issue\s*\n\s*(.+)/i);
             if (clarityMatch) {
@@ -113,7 +100,7 @@ jobs:
                 labels: [`clarity:${clarity}`]
               });
             }
-
+            
             // Parse priority
             const priorityMatch = body.match(/###\s*Priority\s*\n\s*(P[0-3])/i);
             if (priorityMatch) {
@@ -125,7 +112,7 @@ jobs:
                 labels: [priority]
               });
             }
-
+            
             // Parse bot operational status
             const botStatusMatch = body.match(/###\s*Bot Operational Status\s*\n\s*(.+)/i);
             if (botStatusMatch) {
@@ -146,5 +133,5 @@ jobs:
                 });
               }
             }
-
-            console.log("Auto labeling completed with component + title rules.");
+            
+            console.log('Auto-labeling completed');
