@@ -25,13 +25,11 @@ const BotHealth = {
         this.updateRepoLink();
         this.loadSavedConfig();
         
-        // Add popup element to DOM
         const popup = document.createElement('div');
         popup.id = 'issuePopup';
         popup.className = 'issue-popup';
         document.body.appendChild(popup);
         
-        // Hide popup on click outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.component-item') && !e.target.closest('.issue-popup')) {
                 this.hidePopup();
@@ -81,6 +79,11 @@ const BotHealth = {
             return;
         }
         
+        if (end - start > 100) {
+            alert('Maximum range is 100 bots');
+            return;
+        }
+        
         this.botIds = [];
         for (let i = start; i <= end; i++) {
             this.botIds.push(`B${i}`);
@@ -97,16 +100,15 @@ const BotHealth = {
             return;
         }
         
-        // Parse input: "B1, B5, B8" or "B1 B5 B8" or "1, 5, 8"
         this.botIds = input
             .split(/[,\s]+/)
             .map(id => id.trim())
             .filter(id => id)
-            .map(id => id.startsWith('B') ? id : `B${id}`)
+            .map(id => id.toUpperCase().startsWith('B') ? id.toUpperCase() : `B${id}`)
             .filter(id => /^B\d+$/.test(id));
         
         if (this.botIds.length === 0) {
-            alert('No valid bot IDs found');
+            alert('No valid bot IDs found. Use format: B1, B5, B10');
             return;
         }
         
@@ -117,8 +119,13 @@ const BotHealth = {
     async load() {
         if (this.botIds.length === 0) {
             document.getElementById('healthCards').innerHTML = `
-                <div class="loading">Configure bots above to view health status</div>
+                <div class="empty-state">
+                    <div class="empty-state-icon">🤖</div>
+                    <h3>Configure Bots Above</h3>
+                    <p>Select a bot range or manually enter bot IDs to view their health status</p>
+                </div>
             `;
+            document.getElementById('summaryStats').innerHTML = '';
             return;
         }
         
@@ -140,6 +147,7 @@ const BotHealth = {
 
             const issues = await response.json();
             this.issuesData = issues.map(issue => this.parseIssueData(issue));
+            this.renderSummary();
             this.render();
             this.updateLastUpdated();
 
@@ -153,7 +161,7 @@ const BotHealth = {
         const title = issue.title || '';
         
         const botIdMatch = title.match(/\[([^\]]+)\]/);
-        const botId = botIdMatch ? botIdMatch[1] : 'Unknown';
+        const botId = botIdMatch ? botIdMatch[1].toUpperCase() : 'Unknown';
 
         const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
         const component = componentMatch ? componentMatch[1].trim() : 'Unknown';
@@ -174,20 +182,17 @@ const BotHealth = {
         const clarity = clarityMatch ? clarityMatch[1].trim() : 'Unknown';
 
         const descMatch = body.match(/###\s*Issue Description\s*\n\s*(.+?)(?=\n###|\n\n|$)/is);
-        const description = descMatch ? descMatch[1].trim() : '';
-
-        const timeMatch = body.match(/###\s*Issue Start Time\s*\n\s*(.+)/i);
-        const issueTime = timeMatch ? timeMatch[1].trim() : '';
+        const description = descMatch ? descMatch[1].trim().substring(0, 200) : '';
 
         const issueTitle = title.replace(/\[[^\]]+\]\s*/, '').trim();
 
-        // Determine severity from component status
         let severity = 'healthy';
-        if (componentStatus.toLowerCase().includes('non-functional')) {
+        const statusLower = componentStatus.toLowerCase();
+        if (statusLower.includes('non-functional') || statusLower.includes('completely down')) {
             severity = 'critical';
-        } else if (componentStatus.toLowerCase().includes('intermittent') || 
-                   componentStatus.toLowerCase().includes('degraded') ||
-                   componentStatus.toLowerCase().includes('error')) {
+        } else if (statusLower.includes('intermittent') || 
+                   statusLower.includes('degraded') ||
+                   statusLower.includes('error')) {
             severity = 'degraded';
         }
 
@@ -199,7 +204,6 @@ const BotHealth = {
             category,
             clarity,
             description,
-            issueTime,
             issueTitle,
             issueNumber: issue.number,
             issueUrl: issue.html_url,
@@ -214,11 +218,7 @@ const BotHealth = {
             i.component.toLowerCase() === component.toLowerCase()
         );
         
-        if (!issue) {
-            return { status: 'healthy', issue: null };
-        }
-        
-        return { status: issue.severity, issue };
+        return issue ? { status: issue.severity, issue } : { status: 'healthy', issue: null };
     },
 
     getBotOverallStatus(botId) {
@@ -233,19 +233,52 @@ const BotHealth = {
             else healthyCount++;
         });
         
-        const totalComponents = this.components.length;
-        
         return {
             status: hasCritical ? 'critical' : hasDegraded ? 'degraded' : 'healthy',
             healthyCount,
-            totalComponents
+            totalComponents: this.components.length
         };
     },
 
+    renderSummary() {
+        let healthyBots = 0;
+        let degradedBots = 0;
+        let criticalBots = 0;
+
+        this.botIds.forEach(botId => {
+            const status = this.getBotOverallStatus(botId);
+            if (status.status === 'healthy') healthyBots++;
+            else if (status.status === 'degraded') degradedBots++;
+            else if (status.status === 'critical') criticalBots++;
+        });
+
+        document.getElementById('summaryStats').innerHTML = `
+            <div class="health-summary-stats">
+                <h3>Fleet Overview</h3>
+                <div class="health-stats-grid">
+                    <div class="health-stat-item total">
+                        <div class="health-stat-label">Total Bots</div>
+                        <div class="health-stat-value">${this.botIds.length}</div>
+                    </div>
+                    <div class="health-stat-item healthy">
+                        <div class="health-stat-label">Healthy</div>
+                        <div class="health-stat-value">${healthyBots}</div>
+                    </div>
+                    <div class="health-stat-item degraded">
+                        <div class="health-stat-label">Degraded</div>
+                        <div class="health-stat-value">${degradedBots}</div>
+                    </div>
+                    <div class="health-stat-item critical">
+                        <div class="health-stat-label">Critical</div>
+                        <div class="health-stat-value">${criticalBots}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
     render() {
-        if (this.botIds.length === 0) {
-            return;
-        }
+        if (this.botIds.length === 0) return;
 
         let html = '<div class="health-grid">';
 
@@ -257,7 +290,9 @@ const BotHealth = {
                     <div class="bot-health-header">
                         <div class="bot-health-id">${botId}</div>
                         <div class="bot-health-status ${overallStatus.status}">
-                            ${overallStatus.status.toUpperCase()}
+                            ${overallStatus.status === 'healthy' ? '✓ Operational' : 
+                              overallStatus.status === 'degraded' ? '⚠ Degraded' : 
+                              '✗ Critical'}
                         </div>
                         <div class="bot-health-summary">
                             ${overallStatus.healthyCount} / ${overallStatus.totalComponents} subsystems healthy
@@ -272,12 +307,11 @@ const BotHealth = {
                 
                 html += `
                     <div class="component-item ${hasIssue ? 'has-issue' : ''}" 
-                         ${hasIssue ? `onclick="BotHealth.showPopup(event, '${botId}', '${component}')"` : ''}>
+                         ${hasIssue ? `data-bot="${botId}" data-component="${component}"` : ''}>
                         <span class="component-name">${component}</span>
                         <span class="component-health ${health.status}">
-                            ${health.status === 'healthy' ? '🟢 HEALTHY' : 
-                              health.status === 'degraded' ? '🟡 DEGRADED' : 
-                              '🔴 CRITICAL'}
+                            <span class="status-icon">${health.status === 'healthy' ? '●' : health.status === 'degraded' ? '●' : '●'}</span>
+                            ${health.status.toUpperCase()}
                         </span>
                     </div>
                 `;
@@ -292,6 +326,14 @@ const BotHealth = {
         html += '</div>';
 
         document.getElementById('healthCards').innerHTML = html;
+        
+        document.querySelectorAll('.component-item.has-issue').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const botId = item.getAttribute('data-bot');
+                const component = item.getAttribute('data-component');
+                this.showPopup(e, botId, component);
+            });
+        });
     },
 
     showPopup(event, botId, component) {
@@ -307,19 +349,41 @@ const BotHealth = {
         
         popup.innerHTML = `
             <h4>${issue.issueTitle}</h4>
-            <div class="issue-popup-row"><strong>Status:</strong> ${issue.componentStatus}</div>
-            <div class="issue-popup-row"><strong>Priority:</strong> ${issue.priority.toUpperCase()}</div>
-            <div class="issue-popup-row"><strong>Category:</strong> ${issue.category}</div>
-            <div class="issue-popup-row"><strong>Clarity:</strong> ${issue.clarity}</div>
-            <div class="issue-popup-row"><strong>Duration:</strong> ${timeSince}</div>
-            ${issue.description ? `<div class="issue-popup-row" style="margin-top: 10px;"><strong>Description:</strong><br>${issue.description.substring(0, 150)}${issue.description.length > 150 ? '...' : ''}</div>` : ''}
-            <a href="${issue.issueUrl}" target="_blank" class="issue-popup-link">View Issue #${issue.issueNumber} →</a>
+            <div class="issue-popup-row">
+                <strong>Component:</strong>
+                <span>${issue.component}</span>
+            </div>
+            <div class="issue-popup-row">
+                <strong>Status:</strong>
+                <span>${issue.componentStatus}</span>
+            </div>
+            <div class="issue-popup-row">
+                <strong>Priority:</strong>
+                <span class="priority-badge ${issue.priority}">${issue.priority.toUpperCase()}</span>
+            </div>
+            <div class="issue-popup-row">
+                <strong>Category:</strong>
+                <span class="category-badge ${issue.category.toLowerCase()}">${issue.category}</span>
+            </div>
+            <div class="issue-popup-row">
+                <strong>Duration:</strong>
+                <span>${timeSince}</span>
+            </div>
+            ${issue.description ? `<div class="issue-popup-description">${issue.description}${issue.description.length === 200 ? '...' : ''}</div>` : ''}
+            <a href="${issue.issueUrl}" target="_blank" class="issue-popup-link">View Full Issue #${issue.issueNumber}</a>
         `;
         
-        // Position popup near the clicked element
         const rect = event.target.closest('.component-item').getBoundingClientRect();
-        popup.style.left = `${rect.left}px`;
-        popup.style.top = `${rect.bottom + 5}px`;
+        const popupWidth = 350;
+        const windowWidth = window.innerWidth;
+        
+        let left = rect.left;
+        if (left + popupWidth > windowWidth) {
+            left = windowWidth - popupWidth - 20;
+        }
+        
+        popup.style.left = `${left}px`;
+        popup.style.top = `${rect.bottom + window.scrollY + 10}px`;
         popup.classList.add('show');
     },
 
@@ -338,11 +402,11 @@ const BotHealth = {
         const days = Math.floor(hours / 24);
         
         if (days > 0) {
-            return `${days} day${days !== 1 ? 's' : ''} ${hours % 24}h`;
+            return `${days}d ${hours % 24}h`;
         } else if (hours > 0) {
-            return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes % 60}m`;
+            return `${hours}h ${minutes % 60}m`;
         } else {
-            return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            return `${minutes}m`;
         }
     },
 
@@ -350,9 +414,10 @@ const BotHealth = {
         document.getElementById('healthCards').innerHTML = `
             <div class="loading">
                 <div class="loading-spinner"></div>
-                ${message}
+                <span>${message}</span>
             </div>
         `;
+        document.getElementById('summaryStats').innerHTML = '';
     },
 
     showError(message) {
