@@ -1,0 +1,123 @@
+name: Bulk Label Old Issues
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  bulk-label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Label all open issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const componentToFeatureMap = {
+              'drive-motor': 'F1_bot_movement',
+              'motherboard': 'F1_bot_movement',
+              'station-reader': 'F2_station_reader',
+              'diverter': 'F3_switching',
+              'afc': 'F6_drop_off',
+              'electromagnet': 'F6_drop_off',
+              'wtm-reader': 'F4_collision',
+              'conveyor-motor': 'F5_infeed',
+              'conveyor-belt': 'F5_infeed',
+              // Add all mappings
+            };
+            
+            const titleToFeatureMap = {
+              'WTM': 'F4_collision',
+              'Infeed': 'F5_infeed',
+            };
+            
+            // Fetch all open issues
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            console.log(`Found ${issues.length} open issues`);
+            
+            for (const issue of issues) {
+              const body = issue.body || '';
+              const title = issue.title || '';
+              const labelsToAdd = [];
+              
+              // Parse component
+              const componentMatch = body.match(/###\s*Affected Component\s*\n\s*(.+)/i);
+              if (componentMatch) {
+                const component = componentMatch[1].trim().toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace(/\//g, '-')
+                  .replace(/[()]/g, '');
+                
+                if (componentToFeatureMap[component]) {
+                  labelsToAdd.push(componentToFeatureMap[component]);
+                }
+              }
+              
+              // Check title
+              for (const [keyword, featureLabel] of Object.entries(titleToFeatureMap)) {
+                if (title.includes(`[${keyword}]`)) {
+                  labelsToAdd.push(featureLabel);
+                  break;
+                }
+              }
+              
+              // Add labels if any found
+              if (labelsToAdd.length > 0) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: labelsToAdd
+                });
+                console.log(`Issue #${issue.number}: Added labels ${labelsToAdd.join(', ')}`);
+              }
+              
+              // Add delay to avoid rate limiting
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            console.log('Bulk labeling completed');
+```
+
+**How to use:**
+1. Go to Actions tab in your repository
+2. Find "Bulk Label Old Issues" workflow
+3. Click "Run workflow"
+4. It will process all open issues and add feature labels
+
+---
+
+## 📊 Priority of Feature Assignment
+
+If an issue could match multiple features, the workflow follows this priority:
+
+1. **Title-based** (highest priority)
+   - `[WTM]` → F4_collision
+   - `[Infeed]` → F5_infeed
+
+2. **Component-based** (if no title match)
+   - Drive Motor → F1_bot_movement
+   - Diverter → F3_switching
+   - etc.
+
+---
+
+## 🏷️ Labels to Create
+
+Create these feature labels in your repository:
+```
+F1_bot_movement (color: #0366d6)
+F2_station_reader (color: #1d76db)
+F3_switching (color: #0052cc)
+F4_collision (color: #5319e7)
+F5_infeed (color: #006b75)
+F6_drop_off (color: #0e8a16)
+F7_motherbag_closure (color: #b60205)
+F8_dashboard (color: #d93f0b)
